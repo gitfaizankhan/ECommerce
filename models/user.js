@@ -16,15 +16,45 @@ class User {
   }
 
   addToCart(product) {
-    const cartProduct = this.cart.items.findIndex(cp=>{
-      return cp._id === product._id;
+    const cartProductIndex = this.cart.items.findIndex(cp=>{
+      return cp.productId.toString() === product._id.toString();
     });
-    const updateCart = { items: [{ ...product, quantity: 1}] };
+    let newQuantity = 1;
+    const updatedCartItems = [...this.cart.items];
+
+    if(cartProductIndex >= 0){
+      newQuantity = this.cart.items[cartProductIndex].quantity + 1;
+      updatedCartItems[cartProductIndex].quantity = newQuantity;
+    }else{
+      updatedCartItems.push(
+        { productId: new mongodb.ObjectId(product._id), quantity: newQuantity }
+      )
+    }
+    const updateCart = { items: updatedCartItems};
     const db = getDb();
     return db.collection('users').updateOne(
       {_id: new mongodb.ObjectId(this._id) },
       {$set: {cart: updateCart}}
     )
+  }
+
+  getCart(){
+    const db = getDb();
+    const productIds = this.cart.items.map(i =>{
+      return i.productId
+    });
+    return db
+      .collection('products')
+      .find({ _id: { $in: productIds } })
+      .toArray()
+      .then(products =>{
+        return products.map(p =>{
+          return {...p, quantity: this.cart.items.find(i => {
+            return i.productId.toString() === p._id.toString();
+          }).quantity
+        };
+      });
+    });
   }
 
 
