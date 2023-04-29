@@ -17,7 +17,7 @@ class User {
 
   addToCart(product) {
     const cartProductIndex = this.cart.items.findIndex(cp=>{
-      return cp.productId.toString() === product._id.toString();
+      return cp.productId.toString() !== product._id.toString();
     });
     let newQuantity = 1;
     const updatedCartItems = [...this.cart.items];
@@ -38,6 +38,13 @@ class User {
     )
   }
 
+  // addToCart(product) {
+  //   const cartProduct = this.cart.items.findIndex(cp => {
+  //     return cp._id === product._id;
+  //   });
+  //   const updateCart = { items: [{ ...product, quantity: 1 }] };
+  // }
+  
   getCart(){
     const db = getDb();
     const productIds = this.cart.items.map(i =>{
