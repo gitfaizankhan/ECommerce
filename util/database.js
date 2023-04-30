@@ -2,7 +2,7 @@ const mongodb = require('mongodb');
 const MongoClient = mongodb.MongoClient;
 let _db;
 const mongoConnect = callback =>{
-  MongoClient.connect('mongodb://0.0.0.0:27017/cartShop')
+  MongoClient.connect('mongodb://0.0.0.0:27017/shop', { useUnifiedTopology: true })
     .then(client => {
       console.log('Connected!');
       _db = client.db();
